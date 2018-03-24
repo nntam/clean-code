@@ -47,6 +47,19 @@ We are honest about the state of our code because code is never perfect.
 
 ## Introduction
 
+Learning to write clean code is *hard work*. It requires more than just the knowledge of principles and patterns. 
+
+You must practice it yourself, and watch yourself fail.
+
+This book will make you work, *and work hard*. What kind of work will you be doing?
+
+You’ll be reading code—lots of code. And you will be challenged to think about what’s right about that code and what’s wrong with it.
+
+This book into three parts:
+* First part: The first several chapters describe the principles, patterns, and practices of writing clean code.
+* Second part: It consists of several case studies of ever-increasing complexity. Each case study is an exercise in cleaning up some code—of transforming code that has some problems into code that has fewer problems.
+* Third part: It is a single chapter containing a list of heuristics and smells gathered while creating the case studies.
+
 ## On the Cover
 
 ## Chapter 1 - Clean Code
