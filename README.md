@@ -125,6 +125,255 @@ The ratio of time spent reading vs. writing is well over 10:1.
 To write new code we need to read the old one.
 
 ## Chapter 2 - Meaningful Names
+
+Names are everywhere in software. We name our variables, our functions, our arguments, classes, and packages...
+
+So, we need to follow some simple rules for creating good names.
+
+### Use Intention-Revealing Names
+
+The name should answer all the big questions. It should tell you:
+* Why it exists?
+* What it does?
+* How it is used?
+
+The name *d* reveals nothing:
+```java
+int d; // elapsed time in days
+```
+
+We should choose a name that specifies what is being measured and the unit of that measurement:
+```java
+int elapsedTimeInDays;
+int daysSinceCreation;
+int daysSinceModification;
+int fileAgeInDays;
+```
+
+Choosing names that reveal intent can make it much easier to understand and change code.
+
+What is the purpose of this code?
+```java
+public List<int[]> getThem() {
+	List<int[]> list1 = new ArrayList<int[]>();
+	for (int[] x : theList)
+		if (x[0] == 4)
+			list1.add(x);
+	return list1;
+}
+```
+
+The code implicitly requires that we know the answers to questions such as:
+* What kinds of things are in *theList*?
+* What is the significance of the zeroth subscript of an item in *theList*?
+* What is the significance of the value *4*?
+* How would I use the list being returned?
+
+We can improve the code:
+```java
+public List<int[]> getFlaggedCells() {
+	List<int[]> flaggedCells = new ArrayList<int[]>();
+	for (int[] cell : gameBoard)
+		if (cell[STATUS_VALUE] == FLAGGED)
+			flaggedCells.add(cell);
+	return flaggedCells;
+}
+```
+
+or
+
+```java
+// Class Cell instead of ints
+// Function isFlagged to hide the magic numbers
+public List<Cell> getFlaggedCells() {
+	List<Cell> flaggedCells = new ArrayList<Cell>();
+	for (Cell cell : gameBoard)
+		if (cell.isFlagged())
+			flaggedCells.add(cell);
+	return flaggedCells;
+}
+```
+
+With these simple name changes, it's not difficult to understand what's going on. This is the power of choosing good names.
+
+### Avoid Disinformation
+
+Do not refer to a *grouping of accounts* as an *accountList* unless it’s actually a *List*.
+
+*accountGroup* or *bunchOfAccounts* or just plain accounts would be better.
+
+Avoid use of lower-case **L** or uppercase **O** as variable names, especially in combination. They look almost entirely like the constants one and zero.
+```java
+int a = l;
+if ( O == l )
+	a = O1;
+else
+	l = 01;
+```
+
+### Make Meaningful Distinctions
+
+Consider:
+```java
+public static void copyChars(char a1[], char a2[]) {
+	for (int i = 0; i < a1.length; i++) {
+		a2[i] = a1[i];
+	}
+}
+```
+
+This function reads much better when *source* and *destination* are used for the argumentnames.
+
+Noise words are redundant, avoid use words: *info, data, a, an, the*
+
+How are the programmers supposed to know which of these functions to call?
+```java
+getActiveAccount();
+getActiveAccounts();
+getActiveAccountInfo();
+```
+
+Distinguish names in such a way that the reader knows what the differences offer.
+* *moneyAmount* is indistinguishable from *money*
+* *customerInfo( is indistinguishable from *customer*
+* *accountData* is indistinguishable from *account*
+* *theMessage* is indistinguishable from *message*
+
+### Use Pronounceable Names
+
+If you can't pronounce it, you can't discuss it.
+
+Compare
+```java
+class DtaRcrd102 {
+	private Date genymdhms;
+	private Date modymdhms;
+	private final String pszqint = "102";
+	/* ... */
+};
+```
+
+to
+```java
+class Customer {
+	private Date generationTimestamp;
+	private Date modificationTimestamp;;
+	private final String recordId = "102";
+	/* ... */
+};
+```
+
+### Use Searchable Names
+
+If a variable or constant might be seen or used in multiple places in a body of code, it is imperative to give it a search-friendly name.
+
+Compare
+```java
+for (int j=0; j<34; j++) {
+	s += (t[j]*4)/5;
+}
+```
+
+to
+```java
+int realDaysPerIdealDay = 4;
+const int WORK_DAYS_PER_WEEK = 5;
+int sum = 0;
+for (int j=0; j < NUMBER_OF_TASKS; j++) {
+	int realTaskDays = taskEstimate[j] * realDaysPerIdealDay;
+	int realTaskWeeks = (realdays / WORK_DAYS_PER_WEEK);
+	sum += realTaskWeeks;
+}
+```
+
+### Avoid Encodings
+
+Encoded names are seldom pronounceable and are easy to mis-type.
+
+### Member Prefixes
+
+You also don't need to prefix member variables with *m_* anymore.
+
+Compare
+```java
+public class Part {
+	private String m_dsc; // The textual description
+	void setName(String name) {
+		m_dsc = name;
+	}
+}
+```
+
+to
+```java
+public class Part {
+	private String description;
+	void setDescription(String description) {
+		this.description = description;
+	}
+}
+```
+
+### Interfaces and Implementations
+
+The interface *IShapeFactory* and implement *ShapeFactory* is bad code.
+The interface *ShapeFactory* and implement *ShapeFactoryImp* is good code.
+
+### Avoid Mental Mapping
+
+One difference between a smart programmer and a professional programmer is that the professional understands that **clarity is king**. Professionals use their powers for good and write code that others can understand.
+
+### Class Names
+
+Classes and objects should have noun or noun phrase names like Customer, WikiPage, Account, and AddressParser. Avoid words like Manager, Processor, Data, or Info in the name of a class.
+
+**A class name should not be a verb**
+
+### Method Names
+
+Methods should have verb or verb phrase names like postPayment, deletePage, or save.
+
+Accessors, mutators, and predicates should be named for their value and prefixed with get, set, and is according to the javabean standard.
+
+### Don't Be Cute
+
+Don't use the name *whack()* to mean *kill()*
+
+Say what you mean. Mean what you say.
+
+### Pick One Word per Concept
+
+A consistent lexicon is a great boon to the programmers who must use your code.
+
+### Don't Pun
+Avoid using the same word for two purposes. 
+
+### Use Solution Domain Names
+
+Remember that the people who read your code will be programmers. So go ahead and use computer science terms, algorithm names, pattern names, math terms, and so forth.
+
+Choosing technical names for those things is usually the most appropriate course.
+
+### Add Meaningful Context
+
+You have variables named *firstName, lastName, street, houseNumber, city, state, and zipcode*. Taken together it's pretty clear that they form an address.
+
+You can add context by using prefixes: *addrFirstName, addrLastName, addrState, and so on*. At least readers will understand that these variables are part of a larger structure. Of course, a better solution is to create a class named **Address**.
+
+The algorithm to be made much cleaner by breaking it into many smaller functions.
+
+### Don't Add Gratuitous Context
+
+it is a bad idea to prefix every class: GSDAccountAddress (GSD = Gas Station Deluxe)
+
+Shorter names are generally better than longer ones
+
+### Final Words
+
+Follow some of these rules and see whether you don’t improve the readability of your code.
+
+If you are maintaining someone else’s code, use refactoring tools to help resolve these problems.
+
 ## Chapter 3 - Functions
 ## Chapter 4 - Comments
 ## Chapter 5 - Formatting
