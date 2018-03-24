@@ -32,7 +32,7 @@ Good software practice requires such discipline: *focus, presence of mind, and t
 
 The 5S philosophy comprises these concepts (Total Productive Maintenance - 1951):
 * **S**eiri (organization): Knowing where things are—using approaches such as suitable naming—is crucial
-* **S**eiton (tidiness): There is an old American saying: *A place for everything, and everything in its place*. A piece of code should be where you expect to find it —— and, if not, you should re-factor to get it there.
+* **S**eiton (tidiness): There is an old American saying: *A place for everything, and everything in its place*. A piece of code should be where you expect to find it - and, if not, you should re-factor to get it there.
 * **S**eiso (cleaning): Remove unused things (comments, etc). Get rid of them
 * **S**eiketsu (standardization): The group agrees about how to keep the workplace clean.
 * **S**hutsuke (self-discipline): Follow the practices, frequently reflect on one's work and be willing to change
@@ -51,18 +51,20 @@ You must practice it yourself, and watch yourself fail.
 
 This book will make you work, *and work hard*. What kind of work will you be doing?
 
-You'll be reading code—lots of code. And you will be challenged to think about what's right about that code and what's wrong with it.
+You'll be reading code, lots of code. And you will be challenged to think about what's right about that code and what's wrong with it.
 
 This book into three parts:
 * First part: The first several chapters describe the principles, patterns, and practices of writing clean code.
-* Second part: It consists of several case studies of ever-increasing complexity. Each case study is an exercise in cleaning up some code—of transforming code that has some problems into code that has fewer problems.
+* Second part: It consists of several case studies of ever-increasing complexity. Each case study is an exercise in cleaning up some code of transforming code that has some problems into code that has fewer problems.
 * Third part: It is a single chapter containing a list of heuristics and smells gathered while creating the case studies.
 
 ## Chapter 1 - Clean Code
 
 ### There will be code
 
-*Programmers simply won't be needed because business people will generate programs from specifications* -> Nonsense! We will never be rid of code, because code represents the details of the requirements
+*Programmers simply won't be needed because business people will generate programs from specifications*
+
+=> Nonsense! We will never be rid of code, because code represents the details of the requirements
 
 ### Bad code
 
@@ -99,6 +101,28 @@ Able to recognize clean code from dirty code does **not mean that we know how to
 Writing clean code requires using myriad little techniques. *This "code-sense" is the key.*
 
 In short, a programmer who writes clean code is an artist.
+
+### What is Clean Code?
+
+Clean code is pleasing to read.
+
+Clean code exhibits close attention to detail.
+
+Clean code makes it easy for other people to enhance it.
+
+There is a difference between *code that is easy to read* and *code that is easy to change*.
+
+Code, without tests, is not clean.
+
+Smaller is better. Keep it simple and orderly.
+
+The beautiful code *makes the language look like it was made for the problem!*
+
+### We are Authors
+
+The ratio of time spent reading vs. writing is well over 10:1.
+
+To write new code we need to read the old one.
 
 ## Chapter 2 - Meaningful Names
 ## Chapter 3 - Functions
