@@ -375,6 +375,67 @@ Follow some of these rules and see whether you don’t improve the readability o
 If you are maintaining someone else’s code, use refactoring tools to help resolve these problems.
 
 ## Chapter 3 - Functions
+
+### Small!
+
+The first rule of functions is that they should be small. The second rule of functions is that they should be smaller than that.
+
+Tunctions should be very small.
+
+Functions should hardly ever be 20 lines long.
+
+Each was transparently obvious. Each told a story. Each led you to the next in a compelling order. *That’s how short your functions should be!*
+
+### Blocks and Indenting
+
+This implies that the blocks within *if* statements, *else* statements, *while* statements, and so on should be one line long. Probably that line should be a function call.
+
+The indent level of a function *should not be greater than one or two*. This, of course, makes the functions easier to read and understand.
+
+### Do One Thing
+
+**FUNCTIONS SHOULD DO ONE THING. THEY SHOULD DO IT WELL. THEY SHOULD DO IT ONLY**
+
+we write functions is to decompose a larger concept (in other words, the name of the function) into a set of steps at the next level of abstraction.
+
+### Sections within Functions
+
+Functions do one thing cannot be reasonably divided into sections.
+
+### One Level of Abstraction per Function
+
+In order to make sure functions are doing *"one thing"*, you need to make sure that the statements within our function are all at the same level of abstraction.
+
+Mixing levels of abstraction within a function is always confusing.
+
+### Reading Code from Top to Bottom: The Stepdown Rule
+
+Making the code read like a top-down set of TO paragraphs is an effective technique for keeping the abstraction level consistent.
+
+### Switch Statements
+
+The example shows just one of the operations that might depend on the type of employee:
+```java
+public Money calculatePay(Employee e) throws InvalidEmployeeType {
+	switch (e.type) {
+		case COMMISSIONED:
+			return calculateCommissionedPay(e);
+		case HOURLY:
+			return calculateHourlyPay(e);
+		case SALARIED:
+			return calculateSalariedPay(e);
+		default:
+			throw new InvalidEmployeeType(e.type);
+	}
+}
+```
+
+There are several problems with this function. 
+* it's large, and when new employee types are added, it will grow. 
+* it very clearly does more than one thing.
+* it violates the Single Responsibility Principle (SRP) because there is more than one reason for it to change.
+* it violates the Open Closed Principle8 (OCP) because it must change whenever new types are added. 
+
 ## Chapter 4 - Comments
 ## Chapter 5 - Formatting
 ## Chapter 6 - Objects and Data Structures
