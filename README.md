@@ -290,7 +290,7 @@ for (int j=0; j < NUMBER_OF_TASKS; j++) {
 
 Encoded names are seldom pronounceable and are easy to mis-type.
 
-### Member Prefixes
+#### Member Prefixes
 
 You also don't need to prefix member variables with *m_* anymore.
 
@@ -314,7 +314,7 @@ public class Part {
 }
 ```
 
-### Interfaces and Implementations
+#### Interfaces and Implementations
 
 The interface *IShapeFactory* and implement *ShapeFactory* is bad code.
 The interface *ShapeFactory* and implement *ShapeFactoryImp* is good code.
@@ -386,7 +386,7 @@ Functions should hardly ever be 20 lines long.
 
 Each was transparently obvious. Each told a story. Each led you to the next in a compelling order. *That’s how short your functions should be!*
 
-### Blocks and Indenting
+#### Blocks and Indenting
 
 This implies that the blocks within *if* statements, *else* statements, *while* statements, and so on should be one line long. Probably that line should be a function call.
 
@@ -398,7 +398,7 @@ The indent level of a function *should not be greater than one or two*. This, of
 
 we write functions is to decompose a larger concept (in other words, the name of the function) into a set of steps at the next level of abstraction.
 
-### Sections within Functions
+#### Sections within Functions
 
 Functions do one thing cannot be reasonably divided into sections.
 
@@ -408,7 +408,7 @@ In order to make sure functions are doing *"one thing"*, you need to make sure t
 
 Mixing levels of abstraction within a function is always confusing.
 
-### Reading Code from Top to Bottom: The Stepdown Rule
+#### Reading Code from Top to Bottom: The Stepdown Rule
 
 Making the code read like a top-down set of TO paragraphs is an effective technique for keeping the abstraction level consistent.
 
@@ -460,7 +460,7 @@ The difficulty of writing all the test cases to ensure that all the various comb
 
 Output arguments are harder to understand than input arguments.
 
-### Common Monadic Forms
+#### Common Monadic Forms
 
 There are two very common reasons to pass a single argument into a function:
 * Asking a question about that argument, as in boolean fileExists(“MyFile”)
@@ -468,7 +468,7 @@ There are two very common reasons to pass a single argument into a function:
 
 A somewhat less common, but still very useful form for a single argument function, is an event.
 
-### Flag Arguments
+#### Flag Arguments
 
 Flag arguments are ugly. It does one thing if the flag is true and another if the flag is false!
 
@@ -485,7 +485,7 @@ renderForSuite()
 renderForSingleTest()
 ```
 
-### Dyadic Functions
+#### Dyadic Functions
 
 A function with two arguments is harder to understand than a monadic function.
 
@@ -493,13 +493,13 @@ For example: *outputStream,writeField(name)* is easier to understand than *write
 
 Sometimes, two arguments are appropriate. For example: *Point p = new Point(0,0);* is perfectly reasonable.
 
-### Triads
+#### Triads
 
 Functions that take three arguments are significantly harder to understand than dyads.
 
 **Very carefully before creating a triad.**
 
-### Argument Objects
+#### Argument Objects
 
 Reducing the number of arguments by creating objects, example:
 
@@ -508,7 +508,7 @@ Circle makeCircle(double x, double y, double radius); // Bad code
 Circle makeCircle(Point center, double radius); // Good code
 ```
 
-### Argument Lists
+#### Argument Lists
 
 The declaration of String.format as shown below is clearly dyadic.
 
@@ -525,7 +525,7 @@ void monad(Integer... args);
 void dyad(String name, Integer... args);
 void triad(String name, int count, Integer... args);
 ```
-### Verbs and Keywords
+#### Verbs and Keywords
 
 Choosing good names for a function can go a long way toward explaining the intent of the function and the order and intent of the arguments. In the case of a monad, the function and argument should form a very nice verb/noun pair.
 
@@ -533,7 +533,7 @@ For example: *write(name)* is very evocative. Whatever this "name" thing is, it 
 
 An even better name might be *writeField(name)*, which tells us that the "name" thing is a "field"
 
-### Output Arguments
+#### Output Arguments
 
 ```java
 appendFooter(s); // s is notot clear: Is s an input or an output?
@@ -589,7 +589,7 @@ catch (Exception e) {
 }
 ```
 
-### Extract Try/Catch Blocks
+#### Extract Try/Catch Blocks
 ```java
 public void delete(Page page) {
 	try {
@@ -611,13 +611,13 @@ private void logError(Exception e) {
 }
 ```
 
-### Error Handling Is One Thing
+#### Error Handling Is One Thing
 
 Functions should do one thing. Error handing is one thing.
 
 The keyword **try** exists in a function should be the very first word in the function and that there should be nothing after the **catch/finally** blocks.
 
-### The Error.java Dependency Magnet
+#### The Error.java Dependency Magnet
 
 When you use exceptions instead of error codes, then new exceptions are derivatives of the exception class. They can be added without forcing any recompilation or redeployment
 
@@ -644,7 +644,135 @@ Functions are the verbs of that language, and classes are the nouns.
 If you follow the rules herein, your functions will be short, well named, and nicely organized.
 
 ## Chapter 4 - Comments
+
+To be updated...
+
 ## Chapter 5 - Formatting
+
+### The Purpose of Formatting
+
+Code formatting is *important*
+
+Code formatting is about communication, and communication is the professional developer's first order of business.
+
+### Vertical Formatting
+
+Let's start with vertical size.
+
+How big should a source file be? In Java, file size is closely related to class size.
+
+Small files are usually easier to understand than large files are.
+
+#### The Newspaper Metaphor
+
+We would like a source file to be like a newspaper article.
+* The name should be simple but explanatory.
+* The topmost parts of the source file should provide the high-level concepts and algorithms.
+* Detail should increase as we move downward
+* We find the lowest level functions and details in the source file at the end.
+
+#### Vertical Openness Between Concepts
+
+Use blank lines to separate the package declaration, the import(s), and each of the functions:
+```java
+package fitnesse.wikitext.widgets;
+
+import java.util.regex.*;
+
+public class BoldWidget extends ParentWidget {
+	public static final String REGEXP = "'''.+?'''";
+	private static final Pattern pattern = Pattern.compile("'''(.+?)'''",
+		Pattern.MULTILINE + Pattern.DOTALL
+	);
+
+	public String render() throws Exception {
+		StringBuffer html = new StringBuffer("<b>");
+		html.append(childHtml()).append("</b>");
+		return html.toString();
+	}
+}
+```
+
+#### Vertical Density
+
+Avoid useless comments
+
+#### Vertical Distance
+
+**Variable Declarations**: Variables should be declared as close to their usage as possible and should appear a the top of each function
+
+Control variables for loops should usually be declared within the loop statement.
+```java
+public int countTestCases() {
+	int count= 0;
+	for (Test each : tests)
+		count += each.countTestCases();
+	return count;
+}
+```
+
+In rare cases, a variable might be declared at the top of a block or just before a loop:
+```java
+...
+.
+for (XmlTest test : m_suite.getTests()) {
+	TestRunner tr = m_runnerFactory.newTestRunner(this, test);
+	tr.addListener(m_textReporter);
+	m_testRunners.add(tr);
+
+	invoker = tr.getInvoker();
+
+	for (ITestNGMethod m : tr.getBeforeSuiteMethods()) {
+		beforeSuiteMethods.put(m.getMethod(), m);
+	}
+
+	for (ITestNGMethod m : tr.getAfterSuiteMethods()) {
+		afterSuiteMethods.put(m.getMethod(), m);
+	}
+}
+...
+```
+
+**Instance variables**: should be declared at the top of the class.
+
+**Dependent Functions**: If one function calls another, they should be vertically close, and the caller should be above the callee, if at all possible.
+
+**Conceptual Affinity**
+
+A group of functions perform a similar operation:
+```javav
+public class Assert {
+	static public void assertTrue(String message, boolean condition) {
+		if (!condition)
+			fail(message);
+	}
+	static public void assertTrue(boolean condition) {
+		assertTrue(null, condition);
+	}
+	static public void assertFalse(String message, boolean condition) {
+		assertTrue(message, !condition);
+	}
+	static public void assertFalse(boolean condition) {
+		assertFalse(null, condition);
+	}
+...
+```
+
+#### Vertical Ordering
+
+That is, a function that is called should be below a function that does the calling
+
+### Horizontal Formatting
+
+Avoid to scroll to the right to see your source.
+
+### Team Rules
+
+A team of developers should agree upon a single formatting style, and then every member of that team should use that style.
+
+A good software system is composed of a set of documents that read nicely
+
+
 ## Chapter 6 - Objects and Data Structures
 ## Chapter 7 - Error Handling
 ## Chapter 8 - Boundaries
