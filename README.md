@@ -431,10 +431,217 @@ public Money calculatePay(Employee e) throws InvalidEmployeeType {
 ```
 
 There are several problems with this function. 
-* it's large, and when new employee types are added, it will grow. 
-* it very clearly does more than one thing.
-* it violates the Single Responsibility Principle (SRP) because there is more than one reason for it to change.
-* it violates the Open Closed Principle8 (OCP) because it must change whenever new types are added. 
+* It's large, and when new employee types are added, it will grow. 
+* It very clearly does more than one thing.
+* It violates the Single Responsibility Principle (SRP) because there is more than one reason for it to change.
+* It violates the Open Closed Principle8 (OCP) because it must change whenever new types are added.
+
+Use *Abstract Factory Pattern* to solve above problem.
+
+### Use Descriptive Names
+
+The smaller and more focused a function is, the easier it is to choose a descriptive name.
+
+Don't be afraid to make a name long. A long descriptive name is better than a short enigmatic name.
+
+Don't be afraid to spend time choosing a name.
+
+Be consistent with your names. For example, the names *includeSetupAndTeardownPages*, *includeSetupPages*, *includeSuiteSetupPage*, and *includeSetupPage*. The similar phraseology in those names allows the sequence to tell a story.
+
+### Function Arguments
+
+* The ideal number of arguments for a function is zero (niladic)
+* Argument is one (monadic)
+* Arguments are two (dyadic)
+* Arguments are Three arguments (triadic) should be avoided where possible
+* More than three (polyadic)
+
+The difficulty of writing all the test cases to ensure that all the various combinations of arguments work properly. If there are no arguments, this is trivial.
+
+Output arguments are harder to understand than input arguments.
+
+### Common Monadic Forms
+
+There are two very common reasons to pass a single argument into a function:
+* Asking a question about that argument, as in boolean fileExists(“MyFile”)
+* Transforming it into something. For example, InputStream fileOpen(“MyFile”) transforms a file name String into an InputStream return value
+
+A somewhat less common, but still very useful form for a single argument function, is an event.
+
+### Flag Arguments
+
+Flag arguments are ugly. It does one thing if the flag is true and another if the flag is false!
+
+Ex:
+```java
+render(boolean isSuite)
+```
+
+helps a little, but not that much. We should have split the function into two: 
+
+```java
+renderForSuite()
+...
+renderForSingleTest()
+```
+
+### Dyadic Functions
+
+A function with two arguments is harder to understand than a monadic function.
+
+For example: *outputStream,writeField(name)* is easier to understand than *writeField(outputStream, name)*
+
+Sometimes, two arguments are appropriate. For example: *Point p = new Point(0,0);* is perfectly reasonable.
+
+### Triads
+
+Functions that take three arguments are significantly harder to understand than dyads.
+
+**Very carefully before creating a triad.**
+
+### Argument Objects
+
+Reducing the number of arguments by creating objects, example:
+
+```java
+Circle makeCircle(double x, double y, double radius); // Bad code
+Circle makeCircle(Point center, double radius); // Good code
+```
+
+### Argument Lists
+
+The declaration of String.format as shown below is clearly dyadic.
+
+```java
+public String format(String format, Object... args)
+```
+
+So all the same rules apply.
+
+But it would be a mistake to give them more arguments than
+that:
+```java
+void monad(Integer... args);
+void dyad(String name, Integer... args);
+void triad(String name, int count, Integer... args);
+```
+### Verbs and Keywords
+
+Choosing good names for a function can go a long way toward explaining the intent of the function and the order and intent of the arguments. In the case of a monad, the function and argument should form a very nice verb/noun pair.
+
+For example: *write(name)* is very evocative. Whatever this "name" thing is, it is being "written".
+
+An even better name might be *writeField(name)*, which tells us that the "name" thing is a "field"
+
+### Output Arguments
+
+```java
+appendFooter(s); // s is notot clear: Is s an input or an output?
+
+public void appendFooter(StringBuffer report) // This clarifies the issue, but only at the expense of checking the declaration of the function.
+
+// it would be better for appendFooter to be invoked as
+report.appendFooter();
+```
+
+### Command Query Separation
+
+Functions should either do something or answer something, but not both.
+
+```java
+public boolean set(String attribute, String value); // Bad code when call: if (set("username", "unclebob"))...
+
+// The solution is to separate the command from the query so that the ambiguity cannot occur.
+public boolean attributeExists(String attribute);
+public boolean setAttribute(String attribute, String value);
+
+```
+
+### Prefer Exceptions to Returning Error Codes
+
+Returning error codes from command functions is a subtle violation of command query separation. 
+```java
+if (deletePage(page) == E_OK) {
+	if (registry.deleteReference(page.name) == E_OK) {
+		if (configKeys.deleteKey(page.name.makeKey()) == E_OK){
+			logger.log("page deleted");
+		} else {
+			logger.log("configKey not deleted");
+		}
+	} else {
+		logger.log("deleteReference from registry failed");
+	}
+} else {
+	logger.log("delete failed");
+	return E_ERROR;
+}
+```
+
+use exceptions instead of returned error codes:
+```java
+try {
+	deletePage(page);
+	registry.deleteReference(page.name);
+	configKeys.deleteKey(page.name.makeKey());
+}
+catch (Exception e) {
+	logger.log(e.getMessage());
+}
+```
+
+### Extract Try/Catch Blocks
+```java
+public void delete(Page page) {
+	try {
+		deletePageAndAllReferences(page);
+	}
+	catch (Exception e) {
+		logError(e);
+	}
+}
+
+private void deletePageAndAllReferences(Page page) throws Exception {
+	deletePage(page);
+	registry.deleteReference(page.name);
+	configKeys.deleteKey(page.name.makeKey());
+}
+
+private void logError(Exception e) {
+	logger.log(e.getMessage());
+}
+```
+
+### Error Handling Is One Thing
+
+Functions should do one thing. Error handing is one thing.
+
+The keyword **try** exists in a function should be the very first word in the function and that there should be nothing after the **catch/finally** blocks.
+
+### The Error.java Dependency Magnet
+
+When you use exceptions instead of error codes, then new exceptions are derivatives of the exception class. They can be added without forcing any recompilation or redeployment
+
+### Don’t Repeat Yourself
+
+Duplication may be the root of all evil in software. Many principles and practices have been created for the purpose of controlling or eliminating it
+
+### Structured Programming
+
+Some programmers follow Edsger Dijkstra's rules: *every function, and every block within a function, should have one entry and one
+exit*.
+
+Following these rules means that there should only be one *return* statement in a function, no *break* or *continue* statements in a loop, and never, ever, any *goto* statements.
+
+### How Do You Write Functions Like This?
+
+* You can write a function with: long, complicated, lots of indenting, nested loops, long argument lists, duplicated code...
+* After that, you can refine that code, splitting out functions, changing names, eliminating duplication, shrink the methods and reorder them..., all the while keeping the tests passing.
+
+### Conclusion
+
+Functions are the verbs of that language, and classes are the nouns.
+
+If you follow the rules herein, your functions will be short, well named, and nicely organized.
 
 ## Chapter 4 - Comments
 ## Chapter 5 - Formatting
