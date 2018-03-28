@@ -766,6 +766,33 @@ That is, a function that is called should be below a function that does the call
 
 Avoid to scroll to the right to see your source.
 
+#### Horizontal Openness and Density
+
+Use white space (left side and the right side) with assignment operators, Assignment statements.
+
+Do not put spaces between the function names and the opening parenthesis.
+
+Use comma to separate arguments within the function.
+
+Ex:
+```java
+private void measureLine(String line) {
+	lineCount++;
+	int lineSize = line.length();
+	totalChars += lineSize;
+	lineWidthHistogram.addLine(lineSize, lineCount);
+	recordWidestLine(lineSize);
+}
+```
+
+#### Horizontal Alignment
+
+Do not need to line up all the variable names in a set of declarations, or all the rvalues in a set of assignment statements.
+
+#### Indentation
+
+Without indentation, programs would be virtually unreadable by humans
+
 ### Team Rules
 
 A team of developers should agree upon a single formatting style, and then every member of that team should use that style.
