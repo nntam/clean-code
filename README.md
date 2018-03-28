@@ -799,8 +799,183 @@ A team of developers should agree upon a single formatting style, and then every
 
 A good software system is composed of a set of documents that read nicely
 
-
 ## Chapter 6 - Objects and Data Structures
+
+Keep variables private. Don't expose the with public getters an setters function.
+
+### Data Abstraction
+
+Hiding implementation is about abstractions!
+
+Allow users use abstract interfaces to manipulate the essence of the data, without having to know its implementation.
+
+Consider the example below:
+```java
+//Concrete Vehicle
+public interface Vehicle {
+	double getFuelTankCapacityInGallons();
+	double getGallonsOfGasoline();
+}
+
+//Abstract Vehicle
+public interface Vehicle {
+	double getPercentFuelRemaining();
+}
+```
+
+The first uses concrete terms to communicate the fuel level of a vehicle, whereas the second does so with the abstraction of percentage.
+
+In both of the above cases, the second option is preferable. Do not expose the details of data.
+
+### Data/Object Anti-Symmetry
+Example with Procedural Shape
+```java
+public class Square {
+	public Point topLeft;
+	public double side;
+}
+
+public class Rectangle {
+	public Point topLeft;
+	public double height;
+	public double width;
+}
+
+public class Circle {
+	public Point center;
+	public double radius;
+}
+
+public class Geometry {
+	public final double PI = 3.141592653589793;
+	public double area(Object shape) throws NoSuchShapeException
+	{
+		if (shape instanceof Square) {
+			Square s = (Square)shape;
+			return s.side * s.side;
+		}
+		else if (shape instanceof Rectangle) {
+			Rectangle r = (Rectangle)shape;
+			return r.height * r.width;
+		}
+		else if (shape instanceof Circle) {
+			Circle c = (Circle)shape;
+			return PI * c.radius * c.radius;
+		}
+		throw new NoSuchShapeException();
+	}
+}
+```
+
+What would happen if a *perimeter()* function were added to *Geometry*. The shape classes would be unaffected! Any other classes that depended upon the shapes would also be unaffected!
+
+However, if we add a **new shape**, we must change all the functions in Geometry to deal with it. 
+
+This is the object-oriented solution:
+```java
+//Polymorphic Shapes
+public interface Shape {
+	public double area();
+}
+
+public class Square implements Shape {
+	private Point topLeft;
+	private double side;
+	public double area() {
+		return side*side;
+	}
+}
+
+public class Rectangle implements Shape {
+	private Point topLeft;
+	private double height;
+	private double width;
+	public double area() {
+		return height * width;
+	}
+}
+
+public class Circle implements Shape {
+	private Point center;
+	private double radius;
+	public final double PI = 3.141592653589793;
+	public double area() {
+		return PI * radius * radius;
+	}
+}
+```
+
+Here the *area()* method is polymorphic. No *Geometry* class is necessary. So if we add a new shape, none of the existing functions are affected!
+
+> Procedural code (code using data structures) makes it easy to *add new functions without changing the existing data structures*. OO code, on the other hand, makes it easy to *add new classes without changing existing functions*.
+
+The complement is also true:
+
+> Procedural code makes it hard to *add new data structures because all the functions must change*. OO code makes it hard to *add new functions because all the classes must change*.
+
+### The Law of Demeter
+
+The *Law of Demeter* says a module should not know about the innards of the objects it manipulates. 
+
+This means that an object should not expose its internal structure through accessors.
+
+More precisely, the Law of Demeter says that a method f of class C should only call the methods of these:
+* C
+* An object created by f
+* An object passed as an argument to f
+* An object held in an instance variable of C
+
+The following code appears to violate the Law of Demeter (among other things) because it calls the getScratchDir() function on the return value of getOptions() and then calls getAbsolutePath() on the return value of getScratchDir().
+```java
+final String outputDir = ctxt.getOptions().getScratchDir().getAbsolutePath();
+```
+#### Train Wrecks
+
+Continue with example above, it is usually best to split them up as follows:
+```java
+Options opts = ctxt.getOptions();
+File scratchDir = opts.getScratchDir();
+final String outputDir = scratchDir.getAbsolutePath();
+```
+
+* If *ctxt, options and scratchDir* are objects is a clear violation of the Law.
+* If *ctxt, options and scratchDir* are data structures with no behavior Demeter's Law does not apply.
+
+The code had been written as follows if they are data structures:
+```java
+final String outputDir = ctxt.options.scratchDir.absolutePath;
+```
+
+#### Hybrids
+
+Avoid creating hybrid structures that are half object and half data structure.
+
+#### Hiding Structure
+
+If *ctxt* is an object, consider this code from the same module:
+```java
+
+// Function of ctxt object
+public BufferedOutputStream createScratchFileStream(className) {
+	String outFile = outputDir + "/" + className.replace('.', '/') + ".class";
+	FileOutputStream fout = new FileOutputStream(outFile);
+	BufferedOutputStream bos = new BufferedOutputStream(fout);
+}
+
+BufferedOutputStream bos = ctxt.createScratchFileStream(classFileName);
+```
+
+This allows *ctxt* to hide its internals and prevents the current function from having to violate the Law of Demeter.
+
+### Data Transfer Objects
+
+The data structure is a class with public variables and no functions (called a data transfer object, or DTO). DTOs are very useful structures, especially when communicating with databases or parsing messages from sockets, and so on.
+
+### Conclusion
+
+* Using objects if you sometimes want the flexibility to add new data types.
+* Using data types and procedures if you sometimes want the flexibility to add new behaviors.
+
 ## Chapter 7 - Error Handling
 ## Chapter 8 - Boundaries
 ## Chapter 9 - Unit Tests
