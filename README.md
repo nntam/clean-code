@@ -1204,7 +1204,96 @@ Clean code is readable, but it must also be robust.
 We can write robust clean code if we see error handling as a separate concern, something that is viewable independently of our main logic.
 
 ## Chapter 8 - Boundaries
+
 ## Chapter 9 - Unit Tests
+
+### The Three Laws of TDD
+
+By now everyone knows that TDD asks us to write unit tests first, before we write production code:
+* First Law: You may not write production code until you have written a failing unit test.
+* Second Law: You may not write more of a unit test than is sufficient to fail, and not compiling is failing.
+* Third Law: You may not write more production code than is sufficient to pass the currently failing test. 
+
+The tests and the production code are written together, with the tests just a few seconds ahead of the production code.
+
+If we work this way, those tests will cover virtually all of our production code.
+
+### Keeping Tests Clean
+
+"Quick and dirty" was the watchword.
+
+The moral of the story is simple: Test code is just as important as production code. It is not a second-class citizen. It requires thought, design, and care. It must be kept as clean as production code.
+
+#### Tests Enable the -ilities
+
+If you don't keep your tests clean, you will lose them. 
+
+It is unit tests that keep our code flexible, maintainable, and reusable. The reason is simple. 
+
+So having an automated suite of unit tests that cover the production code is the key to keeping your design and architecture as clean as possible. Tests enable all the *-ilities*, because tests enable change.
+
+The dirtier your tests, the dirtier your code becomes.
+
+### Clean Tests
+
+What makes a clean test? Three things: *Readability, readability, and readability*.
+
+Readability is perhaps even more important in unit tests than it is in production code.
+
+### Single Concept per Test
+
+Perhaps a better rule is that we want to test a single concept in each test function.
+
+What makes tests readable? The same thing that makes all code readable: *clarity, simplicity, and density of expression*.
+
+The **BUILD-OPERATE-CHECK** pattern is made obvious by the structure of these tests.
+
+Each of the tests is clearly split into three parts.
+* The first part builds up the test data
+* The second part operates on that test data
+* The third part checks that the operation yielded the expected results.
+
+Anyone who reads these tests should be able to work out what they do very quickly, without being misled or overwhelmed by details.
+
+### A Dual Standard
+
+Testing runs in a test environment, not a production environment, and those two environment have very different needs.
+
+That is the nature of the dual standard. There are things that you might never do in a production environment that are perfectly fine in a test environment. Usually, they involve issues of memory or CPU efficiency. But they never involve issues of cleanliness. 
+
+### One Assert per Test
+
+There is a school of thought that says that every test function in a JUnit test should have one and only one assert statement. A single conclusion is quick and easy to understand. 
+
+We can eliminate the duplication by using the **TEMPLATE METHOD** pattern and putting the given/when parts in the base class, and the then parts in different derivatives.
+
+The number of asserts in a test ought to be minimized.
+
+### Single Concept per Test
+
+Perhaps a better rule is that we want to test a single concept in each test function
+
+### F.I.R.S.T
+
+Clean tests follow five other rules:
+* **Fast**: Tests should be fast. They should run quickly. When tests run slow, you won't want
+to run them frequently.
+
+* **Independent**: Tests should not depend on each other. One test should not set up the conditions for the next test.
+
+* **Repeatable**: Tests should be repeatable in any environment.
+
+* **Self-Validating**: The tests should have a boolean output.
+
+* **Timely**: The tests need to be written in a timely fashion. Unit tests should be written just
+before the production code that makes them pass.
+
+### Conclusion
+
+Tests are as important to the health of a project as the production code is.
+
+Tests preserve and enhance the flexibility, maintainability, and reusability of the production code.
+
 ## Chapter 10 - Classes
 ## Chapter 11 - Systems
 ## Chapter 12 - Emergence
