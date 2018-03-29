@@ -977,6 +977,232 @@ The data structure is a class with public variables and no functions (called a d
 * Using data types and procedures if you sometimes want the flexibility to add new behaviors.
 
 ## Chapter 7 - Error Handling
+
+> Error handling is important, but if it obscures logic, it's wrong.
+
+### Use Exceptions Rather Than Return Codes
+
+You either set an error flag or returned an error code.
+```java
+public class DeviceController {
+	...
+	public void sendShutDown() {
+		DeviceHandle handle = getHandle(DEV1);
+		// Check the state of the device
+		if (handle != DeviceHandle.INVALID) {
+			// Save the device status to the record field
+			retrieveDeviceRecord(handle);
+			// If not suspended, shut down
+			if (record.getStatus() != DEVICE_SUSPENDED) {
+				pauseDevice(handle);
+				clearDeviceWorkQueue(handle);
+				closeDevice(handle);
+			} else {
+				logger.log("Device suspended. Unable to shut down");
+			}
+		} else {
+			logger.log("Invalid handle for: " + DEV1.toString());
+		}
+	}
+...
+}
+```
+
+Unfortunately, it's easy to forget. For this reason, it is better to throw an exception when you encounter an error. The calling code is cleaner. Its logic is not obscured by error handling.
+```java
+public class DeviceController {
+	...
+	public void sendShutDown() {
+		try {
+			tryToShutDown();
+		} catch (DeviceShutDownError e) {
+			logger.log(e);
+		}
+	}
+	
+	private void tryToShutDown() throws DeviceShutDownError {
+		DeviceHandle handle = getHandle(DEV1);
+		DeviceRecord record = retrieveDeviceRecord(handle);
+		
+		pauseDevice(handle);
+		clearDeviceWorkQueue(handle);
+		closeDevice(handle);
+	}
+	
+	private DeviceHandle getHandle(DeviceID id) {
+		...
+		throw new DeviceShutDownError("Invalid handle for: " + id.toString());
+		...
+	}
+...
+}
+```
+
+The code is better because two concerns that were tangled, the algorithm for device shutdown and error handling, are now separated. You can look at each of those concerns and understand them independently.
+
+### Write Your Try-Catch-Finally Statement First
+
+Try blocks are like transactions. Your catch has to leave your program in a consistent state, no matter what happens in the try
+
+Try to write tests that force exceptions, and then add behavior to your handler to satisfy your tests.
+
+### Use Unchecked Exceptions
+
+### Provide Context with Exceptions
+
+Each exception that you throw should provide enough context to determine the source and location of an error. Mention the operation that failed and the type of failure.
+
+### Define Exception Classes in Terms of a Caller's Needs
+
+There are many ways to classify errors. However, when we define exception classes in an application, our most important concern should be how they are caught.
+
+Example for all of the exceptions that the calls can throw:
+```java
+ACMEPort port = new ACMEPort(12);
+try {
+	port.open();
+} catch (DeviceResponseException e) {
+	reportPortError(e);
+	logger.log("Device response exception", e);
+} catch (ATM1212UnlockedException e) {
+	reportPortError(e);
+	logger.log("Unlock exception", e);
+} catch (GMXError e) {
+	reportPortError(e);
+	logger.log("Device response exception");
+} finally {
+…
+}
+```
+
+We can simplify our code considerably by wrapping the API that we are calling and making sure that it returns a common exception type:
+```java
+public class LocalPort {
+	private ACMEPort innerPort;
+	public LocalPort(int portNumber) {
+		innerPort = new ACMEPort(portNumber);
+	}
+	public void open() {
+		try {
+			innerPort.open();
+		} catch (DeviceResponseException e) {
+			throw new PortDeviceFailure(e);
+		} catch (ATM1212UnlockedException e) {
+			throw new PortDeviceFailure(e);
+		} catch (GMXError e) {
+			throw new PortDeviceFailure(e);
+		}
+	}
+	…
+}
+
+LocalPort port = new LocalPort(12);
+try {
+	port.open();
+} catch (PortDeviceFailure e) {
+	reportError(e);
+	logger.log(e.getMessage(), e);
+} finally {
+…
+}
+```
+
+The advantage of wrapping is: 
+* minimize your dependencies upon it
+* can choose to move to a different library in the future without much penalty
+* makes it easier to calls when you are testing your own code.
+
+### Define the Normal Flow
+
+Look at an example
+```java
+try {
+	MealExpenses expenses = expenseReportDAO.getMeals(employee.getID());
+	m_total += expenses.getTotal();
+} catch(MealExpensesNotFound e) {
+	m_total += getMealPerDiem();
+}
+```
+
+In this business, if meals are expensed, they become part of the total. If they aren't, the employee gets a meal per diem amount for that day. The exception clutters the logic.
+
+Our code would look much simpler, if:
+```java
+public class PerDiemMealExpenses implements MealExpenses {
+	public int getTotal() {
+		// return the per diem default
+	}
+}
+...
+MealExpenses expenses = expenseReportDAO.getMeals(employee.getID());
+m_total += expenses.getTotal();
+```
+
+This is called the **SPECIAL CASE PATTERN**. You create a class or configure an object so that it handles a special case for you.
+
+### Don't return null
+
+In many cases, special case objects are an easy remedy. Imagine that you have code like this:
+```java
+List<Employee> employees = getEmployees();
+if (employees != null) {
+	for(Employee e : employees) {
+		totalPay += e.getPay();
+	}
+}
+```
+
+The *getEmployees* function can return null, but does it have to? If we change getEmployee so that it returns an empty list, we can clean up the code:
+```java
+public List<Employee> getEmployees() {
+	if( .. there are no employees .. )
+		return Collections.emptyList();
+}
+...
+List<Employee> employees = getEmployees();
+for(Employee e : employees) {
+	totalPay += e.getPay();
+}
+```
+
+If you code this way, you will minimize the chance of NullPointerExceptions and your code will be cleaner.
+
+### Don't Pass Null
+
+Returning null from methods is bad, but passing null into methods is worse.
+Let's look at an example:
+```java
+public class MetricsCalculator
+{
+	public double xProjection(Point p1, Point p2) {
+		return (p2.x – p1.x) * 1.5;
+	}
+	…
+}
+...
+// What happens when someone passes null as an argument?
+calculator.xProjection(null, new Point(12, 13));
+```
+
+How can we fix it? We could create a new exception type and throw it:
+```java
+public class MetricsCalculator
+{
+	public double xProjection(Point p1, Point p2) {
+		if (p1 == null || p2 == null) {
+			throw InvalidArgumentException("Invalid argument for MetricsCalculator.xProjection");
+		}
+		return (p2.x – p1.x) * 1.5;
+	}
+}
+```
+
+### Conclusion
+
+Clean code is readable, but it must also be robust. 
+
+We can write robust clean code if we see error handling as a separate concern, something that is viewable independently of our main logic.
+
 ## Chapter 8 - Boundaries
 ## Chapter 9 - Unit Tests
 ## Chapter 10 - Classes
