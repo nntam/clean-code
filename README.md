@@ -1108,9 +1108,9 @@ try {
 ```
 
 The advantage of wrapping is: 
-* minimize your dependencies upon it
-* can choose to move to a different library in the future without much penalty
-* makes it easier to calls when you are testing your own code.
+* Minimize your dependencies upon it
+* Can choose to move to a different library in the future without much penalty
+* Makes it easier to calls when you are testing your own code.
 
 ### Define the Normal Flow
 
@@ -1295,6 +1295,73 @@ Tests are as important to the health of a project as the production code is.
 Tests preserve and enhance the flexibility, maintainability, and reusability of the production code.
 
 ## Chapter 10 - Classes
+
+### Class Organization
+
+A class should:
+* Begin with a list of variables. Public static constants, if any, should come first.
+* Then private static variables, followed by private instance variables.
+* *There is seldom a good reason to have a public variable*
+* Public functions should follow the list of variables.
+* Put the private utilities called by a public function right after the public function itself.
+
+#### Encapsulation
+
+We like to keep our variables and utility functions private.
+
+Sometimes we need to make a variable or utility function protected so that it can be accessed by a test.
+
+### Classes Should Be Small!
+
+The first rule of classes is that they should be small. The second rule of classes is that they should be smaller than that. (same text from the *Functions* chapter)
+
+With functions we measured size by counting physical lines. With classes we use a different measure. We count **responsibilities**
+
+Example:
+```java
+public class SuperDashboard extends JFrame implements MetaDataUser
+	public Component getLastFocusedComponent()
+	public void setLastFocused(Component lastFocused)
+	public int getMajorVersionNumber()
+	public int getMinorVersionNumber()
+	public int getBuildNumber()
+}
+```
+
+We should also be able to write a brief description of the class in about 25 words, without using the words "if," "and," "or," or "but." -> That class has one responsibility.
+
+#### The Single Responsibility Principle
+
+The **Single Responsibility Principle** states that a class or module should have one, and only one reason to change. 
+
+Classes should have one responsibility—one reason to change.
+
+#### Cohesion
+
+Classes should have a small number of instance variables. Each of the methods of a class should manipulate one or more of those variables.
+
+In general, the more variables a method manipulates the more cohesive that method is to its class. A class in which each variable is used by each method is maximally cohesive.
+
+In general it is neither advisable nor possible to create such maximally cohesive classes.
+
+You should try to separate the variables and methods into two or more classes such that the new classes are more cohesive.
+
+#### Maintaining Cohesion Results in Many Small Classes
+
+Just the act of breaking large functions into smaller functions causes a proliferation of classes. 
+
+If we promoted those variables to instance variables of the large class, then we could extract the code without passing any variables at all. It would be easy to break the function up into small pieces.
+
+### Organizing for Change
+
+The **Open-Closed Principle**: Classes should be open for extension but closed for modification. Our restructured *Sql* class is open to allow new functionality via subclassing, but we can make this change while keeping every other class closed. 
+
+We simply drop our *UpdateSql* class in place.
+
+We want to structure our systems so that we muck with as little as possible when we update them with new or changed features.
+
+In an ideal system, we incorporate new features by extending the system, not by making modifications to existing code. 
+
 ## Chapter 11 - Systems
 ## Chapter 12 - Emergence
 ## Chapter 13 - Concurrency
